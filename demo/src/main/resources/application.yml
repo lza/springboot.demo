@@ -1,0 +1,76 @@
+spring:
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mysql://localhost:3308/amqp-test?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: leon
+    password: leon
+    maxActive: 50
+    initialSize: 5
+    #配置获取连接等待超时的时间
+    maxWait: 60000
+    minIdle: 5
+    timeBetweenEvictionRunsMillis: 60000
+    #配置一个连接在池中最小生存的时间，单位是毫秒
+    minEvictableIdleTimeMillis: 300000
+    validationQuery: select 'x'
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    #打开PSCache，并且指定每个连接上PSCache的大小
+    poolPreparedStatements: true
+    maxOpenPreparedStatements: 20
+server:
+  port: 8080
+  context-path: /demo
+  tomcat:
+    accesslog:
+      directory: /opt/logs/
+      prefix: acesslog
+      suffix: .log
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+    default-fetch-size: 100
+    default-statement-timeout: 30
+logging:
+    config: config/log4j2.xml
+# - '*'
+# method name must be uppercase
+cors:
+  configs:
+    /api/**:
+      allowCredentials: false
+      allowedOrigins:
+        - '*'
+      allowedMethods:
+        - POST
+        - GET
+        - HEAD
+        - OPTIONS
+swagger:
+  host: localhost:8080
+  apiInfo:
+    title: api title
+    description: api description
+    serviceTerms: My Apps API terms of service
+    license: Apache License Version 2.0
+    licenseUrl: https://github.com/springfox/springfox/blob/master/LICENSE
+    version: version
+    contact:
+      name: leon
+      url: lza.bupt@gmail.com
+      email: lza.bupt@gmail.com
+restTemplate:
+  socket:
+    tcp-no-delay: true
+  message:
+    max-header-count: 200
+    max-line-length: 2000
+  request:
+    connection-request-timeout: 120000
+    connect-timeout: 120000
+    socket-timeout: 60000
+  connection:
+    max-total-connections: 1000
+    max-connections-per-route: 5
