@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "swagger")
 public class Swagger {
     private String host;
-    private ApiInfo apiInfo;
+    private APIInfo apiInfo;
 
     public String getHost() {
         return host;
@@ -20,11 +20,11 @@ public class Swagger {
         this.host = host;
     }
 
-    public ApiInfo getApiInfo() {
+    public APIInfo getApiInfo() {
         return apiInfo;
     }
 
-    public void setApiInfo(ApiInfo apiInfo) {
+    public void setApiInfo(APIInfo apiInfo) {
         this.apiInfo = apiInfo;
     }
 }

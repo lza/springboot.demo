@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.leon.springboot.demo.db.dao.RoleMapper">
+    <resultMap id="BaseResultMap" type="org.leon.springboot.demo.db.model.Role">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="created" jdbcType="TIMESTAMP" property="created"/>
+        <result column="last_modified" jdbcType="TIMESTAMP" property="lastModified"/>
+        <result column="description" jdbcType="VARCHAR" property="description"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, created, last_modified, description, name
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from role
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from role
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+    <insert id="insert" parameterType="org.leon.springboot.demo.db.model.Role">
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into role (description,name)
+        values (#{description,jdbcType=VARCHAR},#{name,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="org.leon.springboot.demo.db.model.Role">
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into role
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="description != null">
+                description,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="description != null">
+                #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="org.leon.springboot.demo.db.model.Role">
+        update role
+        <set>
+            <if test="description != null">
+                description = #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="org.leon.springboot.demo.db.model.Role">
+    update role
+    set
+      description = #{description,jdbcType=VARCHAR},
+      name = #{name,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+    </update>
+
+
+    <resultMap id="R_BaseResultMap" type="org.leon.springboot.demo.db.model.Role">
+        <id column="r_id" jdbcType="BIGINT" property="id"/>
+        <result column="r_created" jdbcType="TIMESTAMP" property="created"/>
+        <result column="r_last_modified" jdbcType="TIMESTAMP" property="lastModified"/>
+        <result column="r_description" jdbcType="VARCHAR" property="description"/>
+        <result column="r_name" jdbcType="VARCHAR" property="name"/>
+
+        <association property="permissions" resultMap="org.leon.springboot.demo.db.dao.PermissionMapper.P_BaseResultMap"/>
+    </resultMap>
+    <sql id="R_Base_Column_List">
+      r.`id` as r_id, r.`created` as r_created, r.`last_modified` as r_last_modified,
+      r.`description` as r_description, r.`name` as r_name
+    </sql>
+    <sql id="select_all_role">
+        SELECT
+        <include refid="R_Base_Column_List"/>
+        ,
+        <include refid="org.leon.springboot.demo.db.dao.PermissionMapper.P_Base_Column_List"/>
+        FROM role r
+        LEFT JOIN role_permissions rp ON r.`id` = rp.`role_id`
+        LEFT JOIN permission p ON rp.`permissions_id` = p.`id`
+    </sql>
+    <select id="findById" resultMap="R_BaseResultMap">
+        <include refid="select_all_role"/>
+        WHERE r.`id` = #{id,jdbcType=BIGINT}
+    </select>
+    <select id="findByName" resultMap="R_BaseResultMap">
+        <include refid="select_all_role"/>
+        WHERE r.`name` = #{name,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteAll">
+        DELETE FROM role
+    </delete>
+    <select id="findAll" resultMap="R_BaseResultMap">
+        <include refid="select_all_role"/>
+    </select>
+</mapper>

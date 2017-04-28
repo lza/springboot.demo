@@ -3,7 +3,7 @@ package org.leon.springboot.demo.config.swagger;
 /**
  * Created by leon on 2016/10/11.
  */
-public class Contact {
+public class ContactInfo {
     private String name;
     private String url;
     private String email;

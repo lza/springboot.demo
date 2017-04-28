@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.leon.springboot.demo.db.dao.PermissionMapper">
+    <resultMap id="BaseResultMap" type="org.leon.springboot.demo.db.model.Permission">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="created" jdbcType="TIMESTAMP" property="created"/>
+        <result column="last_modified" jdbcType="TIMESTAMP" property="lastModified"/>
+        <result column="description" jdbcType="VARCHAR" property="description"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, created, last_modified, description, name
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from permission
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from permission
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+    <insert id="insert" parameterType="org.leon.springboot.demo.db.model.Permission">
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into permission (description,name)
+        values (#{description,jdbcType=VARCHAR},#{name,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="org.leon.springboot.demo.db.model.Permission">
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into permission
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="description != null">
+                description,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="description != null">
+                #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="org.leon.springboot.demo.db.model.Permission">
+        update permission
+        <set>
+            <if test="description != null">
+                description = #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="org.leon.springboot.demo.db.model.Permission">
+    update permission
+    set
+      description = #{description,jdbcType=VARCHAR},
+      name = #{name,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <resultMap id="P_BaseResultMap" type="org.leon.springboot.demo.db.model.Permission">
+        <id column="p_id" jdbcType="BIGINT" property="id"/>
+        <result column="p_created" jdbcType="TIMESTAMP" property="created"/>
+        <result column="p_last_modified" jdbcType="TIMESTAMP" property="lastModified"/>
+        <result column="p_description" jdbcType="VARCHAR" property="description"/>
+        <result column="p_name" jdbcType="VARCHAR" property="name"/>
+    </resultMap>
+    <sql id="P_Base_Column_List">
+        p.`id` as p_id, p.`created` as p_created, p.`last_modified` as p_last_modified,
+        p.`description` as p_description, p.`name` as p_name
+    </sql>
+    <sql id="select_all_permissions">
+        select
+        <include refid="P_Base_Column_List"/>
+        from permission p
+    </sql>
+    <select id="getAll" resultMap="P_BaseResultMap">
+        <include refid="select_all_permissions"/>
+    </select>
+    <select id="findByName" resultMap="P_BaseResultMap">
+        <include refid="select_all_permissions"/>
+        WHERE p.`name` = #{name,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteAll">
+        DELETE FROM permission
+    </delete>
+</mapper>

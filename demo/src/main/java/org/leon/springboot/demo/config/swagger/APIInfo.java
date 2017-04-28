@@ -3,14 +3,14 @@ package org.leon.springboot.demo.config.swagger;
 /**
  * Created by leon on 2016/10/11.
  */
-public class ApiInfo {
+public class APIInfo {
     private String title;
     private String description;
     private String serviceTerms;
     private String license;
     private String licenseUrl;
     private String version;
-    private Contact contact;
+    private ContactInfo contact;
 
     public String getTitle() {
         return title;
@@ -60,11 +60,11 @@ public class ApiInfo {
         this.version = version;
     }
 
-    public Contact getContact() {
+    public ContactInfo getContact() {
         return contact;
     }
 
-    public void setContact(Contact contact) {
+    public void setContact(ContactInfo contact) {
         this.contact = contact;
     }
 }

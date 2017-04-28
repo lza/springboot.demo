@@ -1,7 +1,25 @@
+server:
+  port: 8080
+  context-path: /demo
+  tomcat:
+    accesslog:
+      directory: /opt/logs/
+      prefix: acesslog
+      suffix: .log
+twoFactorAuth:
+  enable: true
+  organization: demo
+  path: /api/**
+  excludes:
+    - /api/twoFactorAuth/auth
+    - /api/twoFactorAuth/getQr
+shiroAuth:
+  path: /api/**
+  sessionTimeout: 10000
 spring:
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mysql://localhost:3308/amqp-test?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    url: jdbc:mysql://localhost:3308/shiro?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: leon
     password: leon
     maxActive: 50
@@ -19,35 +37,12 @@ spring:
     #打开PSCache，并且指定每个连接上PSCache的大小
     poolPreparedStatements: true
     maxOpenPreparedStatements: 20
-server:
-  port: 8080
-  context-path: /demo
-  tomcat:
-    accesslog:
-      directory: /opt/logs/
-      prefix: acesslog
-      suffix: .log
 mybatis:
   mapper-locations: classpath:mapper/*.xml
   configuration:
     map-underscore-to-camel-case: true
     default-fetch-size: 100
     default-statement-timeout: 30
-logging:
-    config: config/log4j2.xml
-# - '*'
-# method name must be uppercase
-cors:
-  configs:
-    /api/**:
-      allowCredentials: false
-      allowedOrigins:
-        - '*'
-      allowedMethods:
-        - POST
-        - GET
-        - HEAD
-        - OPTIONS
 swagger:
   host: localhost:8080
   apiInfo:
@@ -61,6 +56,19 @@ swagger:
       name: leon
       url: lza.bupt@gmail.com
       email: lza.bupt@gmail.com
+# - '*'
+# method name must be uppercase
+cors:
+  configs:
+    /api/**:
+      allowCredentials: false
+      allowedOrigins:
+        - '*'
+      allowedMethods:
+        - POST
+        - GET
+        - HEAD
+        - OPTIONS
 restTemplate:
   socket:
     tcp-no-delay: true
@@ -74,3 +82,5 @@ restTemplate:
   connection:
     max-total-connections: 1000
     max-connections-per-route: 5
+logging:
+    config: config/log4j2.xml

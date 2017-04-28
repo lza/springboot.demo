@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.leon.springboot.demo.db.dao.UserMapper">
+  <resultMap id="BaseResultMap" type="org.leon.springboot.demo.db.model.User">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="created" jdbcType="TIMESTAMP" property="created" />
+    <result column="last_modified" jdbcType="TIMESTAMP" property="lastModified" />
+    <result column="active" jdbcType="BIT" property="active" />
+    <result column="email" jdbcType="VARCHAR" property="email" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="two_factor_auth_activated" jdbcType="BIT" property="twoFactorAuthActivated" />
+    <result column="two_factor_auth_enabled" jdbcType="BIT" property="twoFactorAuthEnabled" />
+    <result column="two_factor_auth_key" jdbcType="VARCHAR" property="twoFactorAuthKey" />
+    <result column="two_factor_auth_totp_url" jdbcType="VARCHAR" property="twoFactorAuthTotpUrl" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, created, last_modified, active, email, name, password, two_factor_auth_activated, 
+    two_factor_auth_enabled, two_factor_auth_key, two_factor_auth_totp_url
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from user
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from user
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="org.leon.springboot.demo.db.model.User">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into user (active,
+      email, name, password, 
+      two_factor_auth_activated, two_factor_auth_enabled, two_factor_auth_key, 
+      two_factor_auth_totp_url)
+    values (#{active,jdbcType=BIT},
+      #{email,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
+      #{twoFactorAuthActivated,jdbcType=BIT}, #{twoFactorAuthEnabled,jdbcType=BIT}, #{twoFactorAuthKey,jdbcType=VARCHAR}, 
+      #{twoFactorAuthTotpUrl,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="org.leon.springboot.demo.db.model.User">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into user
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="active != null">
+        active,
+      </if>
+      <if test="email != null">
+        email,
+      </if>
+      <if test="name != null">
+        name,
+      </if>
+      <if test="password != null">
+        password,
+      </if>
+      <if test="twoFactorAuthActivated != null">
+        two_factor_auth_activated,
+      </if>
+      <if test="twoFactorAuthEnabled != null">
+        two_factor_auth_enabled,
+      </if>
+      <if test="twoFactorAuthKey != null">
+        two_factor_auth_key,
+      </if>
+      <if test="twoFactorAuthTotpUrl != null">
+        two_factor_auth_totp_url,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="active != null">
+        #{active,jdbcType=BIT},
+      </if>
+      <if test="email != null">
+        #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="twoFactorAuthActivated != null">
+        #{twoFactorAuthActivated,jdbcType=BIT},
+      </if>
+      <if test="twoFactorAuthEnabled != null">
+        #{twoFactorAuthEnabled,jdbcType=BIT},
+      </if>
+      <if test="twoFactorAuthKey != null">
+        #{twoFactorAuthKey,jdbcType=VARCHAR},
+      </if>
+      <if test="twoFactorAuthTotpUrl != null">
+        #{twoFactorAuthTotpUrl,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="org.leon.springboot.demo.db.model.User">
+    update user
+    <set>
+      <if test="active != null">
+        active = #{active,jdbcType=BIT},
+      </if>
+      <if test="email != null">
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null">
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="twoFactorAuthActivated != null">
+        two_factor_auth_activated = #{twoFactorAuthActivated,jdbcType=BIT},
+      </if>
+      <if test="twoFactorAuthEnabled != null">
+        two_factor_auth_enabled = #{twoFactorAuthEnabled,jdbcType=BIT},
+      </if>
+      <if test="twoFactorAuthKey != null">
+        two_factor_auth_key = #{twoFactorAuthKey,jdbcType=VARCHAR},
+      </if>
+      <if test="twoFactorAuthTotpUrl != null">
+        two_factor_auth_totp_url = #{twoFactorAuthTotpUrl,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="org.leon.springboot.demo.db.model.User">
+    update user
+    set
+      active = #{active,jdbcType=BIT},
+      email = #{email,jdbcType=VARCHAR},
+      name = #{name,jdbcType=VARCHAR},
+      password = #{password,jdbcType=VARCHAR},
+      two_factor_auth_activated = #{twoFactorAuthActivated,jdbcType=BIT},
+      two_factor_auth_enabled = #{twoFactorAuthEnabled,jdbcType=BIT},
+      two_factor_auth_key = #{twoFactorAuthKey,jdbcType=VARCHAR},
+      two_factor_auth_totp_url = #{twoFactorAuthTotpUrl,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+
+  <resultMap id="U_BaseResultMap" type="org.leon.springboot.demo.db.model.User">
+    <id column="u_id" jdbcType="BIGINT" property="id" />
+    <result column="u_created" jdbcType="TIMESTAMP" property="created" />
+    <result column="u_last_modified" jdbcType="TIMESTAMP" property="lastModified" />
+    <result column="u_active" jdbcType="BIT" property="active" />
+    <result column="u_email" jdbcType="VARCHAR" property="email" />
+    <result column="u_name" jdbcType="VARCHAR" property="name" />
+    <result column="u_password" jdbcType="VARCHAR" property="password" />
+    <result column="u_two_factor_auth_activated" jdbcType="BIT" property="twoFactorAuthActivated" />
+    <result column="u_two_factor_auth_enabled" jdbcType="BIT" property="twoFactorAuthEnabled" />
+    <result column="u_two_factor_auth_key" jdbcType="VARCHAR" property="twoFactorAuthKey" />
+    <result column="u_two_factor_auth_totp_url" jdbcType="VARCHAR" property="twoFactorAuthTotpUrl" />
+
+    <association property="roles" resultMap="org.leon.springboot.demo.db.dao.RoleMapper.R_BaseResultMap"/>
+  </resultMap>
+  <sql id="U_Base_Column_List">
+    u.`id` as u_id, u.`created` as u_created, u.`last_modified` as u_last_modified,
+    u.`active` as u_active, u.`email` as u_email, u.`name` as u_name, u.`password` as u_password,
+    u.`two_factor_auth_activated` as u_two_factor_auth_activated,
+    u.`two_factor_auth_enabled` as u_two_factor_auth_enabled,
+    u.`two_factor_auth_key` as u_two_factor_auth_key,
+    u.`two_factor_auth_totp_url` as u_two_factor_auth_totp_url
+  </sql>
+  <sql id="select_all_user">
+    select
+    <include refid="U_Base_Column_List"/>
+    ,
+    <include refid="org.leon.springboot.demo.db.dao.RoleMapper.R_Base_Column_List"/>
+    ,
+    <include refid="org.leon.springboot.demo.db.dao.PermissionMapper.P_Base_Column_List"/>
+    from user u
+    LEFT JOIN user_roles ur ON u.`id` = ur.`user_id`
+    LEFT JOIN role r ON ur.`roles_id` = r.`id`
+    LEFT JOIN role_permissions rp ON r.`id` = rp.`role_id`
+    LEFT JOIN permission p ON rp.`permissions_id` = p.`id`
+  </sql>
+  <select id="findByEmailAndActive" resultMap="U_BaseResultMap">
+    <include refid="select_all_user"/>
+    where u.`email` = #{email,jdbcType=VARCHAR} and active = #{active,jdbcType=BIT}
+  </select>
+  <select id="getAll" resultMap="U_BaseResultMap">
+    <include refid="select_all_user"/>
+  </select>
+  <delete id="deleteAll">
+    DELETE FROM user
+  </delete>
+</mapper>
