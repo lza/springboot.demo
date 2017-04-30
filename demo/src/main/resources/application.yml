@@ -15,7 +15,7 @@ twoFactorAuth:
     - /api/twoFactorAuth/getQr
 shiroAuth:
   path: /api/**
-  sessionTimeout: 10000
+  sessionTimeout: 60000
 spring:
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver

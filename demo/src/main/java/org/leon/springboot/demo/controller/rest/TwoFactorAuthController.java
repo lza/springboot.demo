@@ -23,10 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
 
@@ -123,10 +120,10 @@ public class TwoFactorAuthController {
         return result;
     }
 
-    @GetMapping(value = "/reset/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/reset", produces = MediaType.APPLICATION_JSON_VALUE)
     @RequiresAuthentication
     @RequiresPermissions(ShiroPermissions.TwoFactorAuthReset)
-    public BaseResult<String> reset(@PathVariable("email")User user){
+    public BaseResult<String> reset(@RequestParam("email")User user){
         BaseResult<String> result = new BaseResult<String>();
 
         try {

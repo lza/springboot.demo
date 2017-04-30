@@ -45,7 +45,7 @@ public class TwoFactorAuthInterceptor extends HandlerInterceptorAdapter {
         logger.debug("servlet path:{}", servletPath);
         String url = servletPath;
         for (String exclude:twoFactorAuthCfg.getExcludes()){
-            if(url.endsWith(exclude)){
+            if(url.startsWith(exclude)){
                 logger.debug("{} exclude from tow factor auth", exclude);
                 return true;
             }

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="warn" monitorInterval="30">
+    <properties>
+        <property name="LogDir">/opt/logs</property>
+        <property name="PatternLayout">[%d{yyyy-MM-dd HH:mm:ss.SSS}][%r][%-5p][%t][%l] - %m%n</property>
+    </properties>
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${PatternLayout}"/>
+        </Console>
+        <File name="File" fileName="${LogDir}/fileupload.log" append="true">
+            <thresholdFilter level="trace" onMatch="accept" onMismatch="deny"/>
+            <PatternLayout pattern="${PatternLayout}"/>
+        </File>
+        <RollingFile name="RollingFile" fileName="${LogDir}/roll.log"
+                     filePattern="${LogDir}/%d{yyyy-MM}/%d{yyyy-MM-dd_HH-mm-ss}_%i.log.gz">
+            <!--<JSONLayout complete="false" locationInfo="true" compact="true" eventEol="true" properties="true"/>-->
+            <sizeBasedTriggeringPolicy size="3KB"/>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <Logger name="org.leon.springboot.demo" level="trace" additivity="false">
+            <AppenderRef ref="Console"/>
+            <!--<AppenderRef ref="File"/>-->
+            <!--<AppenderRef ref="RollingFile"/>-->
+        </Logger>
+        <root level="warn">
+            <AppenderRef ref="Console"/>
+        </root>
+    </Loggers>
+</Configuration>

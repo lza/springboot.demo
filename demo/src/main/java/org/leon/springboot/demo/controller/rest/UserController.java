@@ -19,6 +19,7 @@ import org.leon.springboot.demo.shiro.ShiroPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -48,7 +49,7 @@ public class UserController {
     @Autowired
     private TwoFactorAuthController twoFactorAuthController;
 
-    @PostMapping("/login")
+    @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public BaseResult<String> login(@RequestBody LoginParams loginParams) {
         BaseResult<String> result = new BaseResult<String>();
 
@@ -76,7 +77,7 @@ public class UserController {
         return result;
     }
 
-    @GetMapping("/logout")
+    @GetMapping(value = "/logout", produces = MediaType.APPLICATION_JSON_VALUE)
     public BaseResult<String> logout(){
         BaseResult<String> result = new BaseResult<String>();
 
@@ -94,7 +95,7 @@ public class UserController {
         return result;
     }
 
-    @GetMapping("/getAllPermissions")
+    @GetMapping(value = "/getAllPermissions", produces = MediaType.APPLICATION_JSON_VALUE)
     @RequiresAuthentication
     @RequiresPermissions(ShiroPermissions.UserGetAllPermissions)
     public BaseResult<List<Permission>> getAllPermissions(){
@@ -112,7 +113,7 @@ public class UserController {
         return result;
     }
 
-    @GetMapping("/getPermission/{permissionId}")
+    @GetMapping(value = "/getPermission/{permissionId}",produces = MediaType.APPLICATION_JSON_VALUE)
     @RequiresAuthentication
     @RequiresPermissions(ShiroPermissions.UserGetPermission)
     public BaseResult<Permission> getPermission(@PathVariable("permissionId")Permission permission){
@@ -135,7 +136,7 @@ public class UserController {
         return result;
     }
 
-    @GetMapping("/getAllRoles")
+    @GetMapping(value = "/getAllRoles", produces = MediaType.APPLICATION_JSON_VALUE)
     @RequiresAuthentication
     @RequiresPermissions(ShiroPermissions.UserGetAllRoles)
     public BaseResult<List<Role>> getAllRoles(){
@@ -153,7 +154,7 @@ public class UserController {
         return result;
     }
 
-    @GetMapping("/getRole/{roleId}")
+    @GetMapping(value = "/getRole/{roleId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @RequiresAuthentication
     @RequiresPermissions(ShiroPermissions.UserGetRole)
     public BaseResult<Role> getRole(@PathVariable("roleId")Role role){
@@ -176,7 +177,7 @@ public class UserController {
         return result;
     }
 
-    @GetMapping("/getMyPermissions")
+    @GetMapping(value = "/getMyPermissions", produces = MediaType.APPLICATION_JSON_VALUE)
     @RequiresAuthentication
     @RequiresPermissions(ShiroPermissions.UserGetMyPermissions)
     public BaseResult<List<Role>> getMyPermissions(){
@@ -197,7 +198,7 @@ public class UserController {
         return result;
     }
 
-    @PostMapping("/addRole")
+    @PostMapping(value = "/addRole", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RequiresAuthentication
     @RequiresPermissions(ShiroPermissions.UserAddRole)
     public BaseResult<Role> addRole(@RequestBody Role role){
@@ -234,7 +235,7 @@ public class UserController {
         return result;
     }
 
-    @PostMapping("/updateRole")
+    @PostMapping(value = "/updateRole", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RequiresAuthentication
     @RequiresPermissions(ShiroPermissions.UserUpdateRole)
     public BaseResult<Role> updateRole(@RequestBody Role role){
@@ -263,7 +264,7 @@ public class UserController {
         return result;
     }
 
-    @GetMapping("/deleteRole/{roleId}")
+    @GetMapping(value = "/deleteRole/{roleId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @RequiresAuthentication
     @RequiresPermissions(ShiroPermissions.UserDeleteRole)
     public BaseResult<String> deleteRole(@PathVariable("roleId")Role role){
@@ -286,7 +287,7 @@ public class UserController {
         return result;
     }
 
-    @GetMapping("/grantPermission/{roleId}/{permissionId}")
+    @GetMapping(value = "/grantPermission/{roleId}/{permissionId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @RequiresAuthentication
     @RequiresPermissions(ShiroPermissions.UserGrantPermission)
     public BaseResult<Role> grantPermission(@PathVariable("roleId")Role role,@PathVariable("permissionId")Permission permission){
@@ -323,7 +324,7 @@ public class UserController {
         return result;
     }
 
-    @GetMapping("/revokePermission/{roleId}/{permissionId}")
+    @GetMapping(value = "/revokePermission/{roleId}/{permissionId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @RequiresAuthentication
     @RequiresPermissions(ShiroPermissions.UserRevokePermission)
     public BaseResult<Role> revokePermission(@PathVariable("roleId")Role role,@PathVariable("permissionId")Permission permission){
@@ -371,17 +372,18 @@ public class UserController {
         return result;
     }
 
-    @PostMapping("/addUser")
+    @PostMapping(value = "/addUser", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RequiresAuthentication
     @RequiresPermissions(ShiroPermissions.UserAddUser)
     public BaseResult<User> addUser(@RequestBody User user){
         BaseResult<User> result = new BaseResult<User>();
 
         try {
+            boolean twoFactorAuthEnabled = user.getTwoFactorAuthEnabled();
             String email = user.getEmail();
             String name = user.getName();
             String password = user.getPassword();
-            if(null == email || null == password){
+            if(null == email || email.length() < 1 || null == password || password.length() < 1){
                 result.setStatus("400");
                 result.setMsg("email & password could not be null:" + email + "," + password);
                 return result;
@@ -395,6 +397,7 @@ public class UserController {
 
             tempUser = new User();
             tempUser.setActive(true);
+            tempUser.setTwoFactorAuthEnabled(twoFactorAuthEnabled);
             tempUser.setEmail(email);
             tempUser.setName(name);
             tempUser.setPassword(passwordService.encryptPassword(password));
@@ -413,28 +416,36 @@ public class UserController {
         return result;
     }
 
-    @PostMapping("/updateUser")
+    @PostMapping(value = "/updateUser", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RequiresAuthentication
     @RequiresPermissions(ShiroPermissions.UserUpdateUser)
     public BaseResult<User> updateUser(@RequestBody User user){
         BaseResult<User> result = new BaseResult<User>();
 
         try {
-            if(null == user){
-                result.setStatus("400");
-                result.setMsg("user not exist");
-                return result;
-            }
+            final Subject subject = SecurityUtils.getSubject();
+            String email = (String) subject.getPrincipal();
+            User myself = userService.findByEmailAndActive(email, true);
+
+            boolean passwordChange = false;
+            User tempUser = new User();
+            tempUser.setId(myself.getId());
+
             String name = user.getName();
             String password = user.getPassword();
+            if(name != null && name.length() > 0){
+                tempUser.setName(name);
+            }
             if(password != null && password.length() > 0){
                 password = passwordService.encryptPassword(password);
+                tempUser.setPassword(password);
+                passwordChange = true;
             }
-            User tempUser = new User();
-            tempUser.setId(user.getId());
-            tempUser.setName(name);
-            tempUser.setPassword(password);
             userService.update(tempUser);
+            if(passwordChange && myself.getTwoFactorAuthEnabled()){
+                twoFactorAuthController.init(myself, false);
+            }
+
             result.setStatus("200");
         } catch (Exception e){
             logger.error("exception:" + e);
@@ -445,10 +456,48 @@ public class UserController {
         return result;
     }
 
-    @GetMapping("/deleteUser/{email}")
+    @PostMapping(value = "/resetUser", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequiresAuthentication
+    @RequiresPermissions(ShiroPermissions.UserResetUser)
+    public BaseResult<User> resetUser(@RequestParam("email")User user,
+                                      @RequestParam("password")String password,
+                                      @RequestParam("twoFactorAuthEnable")Boolean twoFactorAuthEnable){
+        BaseResult<User> result = new BaseResult<User>();
+
+        try {
+            if(null == user){
+                result.setStatus("400");
+                result.setMsg("user not exist");
+                return result;
+            }
+            if(null == password || password.length() < 1){
+                result.setStatus("400");
+                result.setMsg("invalid password");
+                return result;
+            }
+            password = passwordService.encryptPassword(password);
+            User tempUser = new User();
+            tempUser.setId(user.getId());
+            tempUser.setPassword(password);
+            tempUser.setTwoFactorAuthEnabled(twoFactorAuthEnable);
+            userService.update(user);
+            if(twoFactorAuthEnable){
+                twoFactorAuthController.init(user,false);
+            }
+            result.setStatus("200");
+        } catch (Exception e){
+            logger.error("exception:" + e);
+            result.setStatus("500");
+            result.setMsg("exception:" + e.getMessage());
+        }
+
+        return result;
+    }
+
+    @GetMapping(value = "/deleteUser", produces = MediaType.APPLICATION_JSON_VALUE)
     @RequiresAuthentication
     @RequiresPermissions(ShiroPermissions.UserDeleteUser)
-    public BaseResult<String> deleteUser(@PathVariable("email")User user){
+    public BaseResult<String> deleteUser(@RequestParam("email")User user){
         BaseResult<String> result = new BaseResult<String>();
 
         try {
@@ -471,31 +520,16 @@ public class UserController {
         return result;
     }
 
-    @GetMapping("/grantRole/{roleId}")
+    @GetMapping(value = "/grantRole/{roleId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @RequiresAuthentication
     @RequiresPermissions(ShiroPermissions.UserGrantRole)
-    public BaseResult<User> grantRole(@PathVariable("roleId") Role role){
-        BaseResult<User> result = new BaseResult<User>();
+    public BaseResult<String> grantRole(@PathVariable("roleId") Role role){
+        BaseResult<String> result = new BaseResult<String>();
         try {
-            if(null == role){
-                result.setStatus("400");
-                result.setMsg("role not exist");
-                return result;
-            }
             final Subject subject = SecurityUtils.getSubject();
             String email = (String) subject.getPrincipal();
             User user = userService.findByEmailAndActive(email, true);
-            List<Role> roles = user.getRoles();
-            roles.add(role);
-
-            User tempUser = new User();
-            tempUser.setId(user.getId());
-            tempUser.setRoles(roles);
-            userService.update(tempUser);
-            tempUser = userService.findByEmailAndActive(email, true);
-
-            result.setStatus("200");
-            result.setData(tempUser);
+            result = grantRole(user, role, result);
         } catch (Exception e){
             logger.error("exception:" + e);
             result.setStatus("500");
@@ -505,40 +539,55 @@ public class UserController {
         return result;
     }
 
-    @GetMapping("/revokeRole/{roleId}")
+    private BaseResult<String> grantRole(User user, Role role, BaseResult<String> result){
+        if(null == user){
+            result.setStatus("400");
+            result.setMsg("user not exist");
+            return result;
+        }
+        if(null == role){
+            result.setStatus("400");
+            result.setMsg("role not exist");
+            return result;
+        }
+        List<Role> roles = user.getRoles();
+        roles.add(role);
+
+        User tempUser = new User();
+        tempUser.setId(user.getId());
+        tempUser.setRoles(roles);
+        userService.update(tempUser);
+        result.setStatus("200");
+        return result;
+    }
+
+    @GetMapping(value = "/grantOtherRole/{roleId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequiresAuthentication
+    @RequiresPermissions(ShiroPermissions.UserGrantOtherRole)
+    public BaseResult<String> grantOtherRole(@PathVariable("roleId") Role role, @RequestParam("email")User user){
+        BaseResult<String> result = new BaseResult<String>();
+        try {
+            result = grantRole(user, role, result);
+        } catch (Exception e){
+            logger.error("exception:" + e);
+            result.setStatus("500");
+            result.setMsg("exception:" + e.getMessage());
+        }
+
+        return result;
+    }
+
+    @GetMapping(value = "/revokeRole/{roleId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @RequiresAuthentication
     @RequiresPermissions(ShiroPermissions.UserRevokeRole)
     public BaseResult<String> revokeRole(@PathVariable("roleId") Role role){
         BaseResult<String> result = new BaseResult<String>();
 
         try {
-            if(null == role){
-                result.setStatus("400");
-                result.setMsg("role not exist");
-                return result;
-            }
             final Subject subject = SecurityUtils.getSubject();
             String email = (String) subject.getPrincipal();
             User user = userService.findByEmailAndActive(email, true);
-            boolean found = false;
-            List<Role> roles = user.getRoles();
-            for (Role r:roles){
-                if(r.getId() == role.getId()){
-                    roles.remove(r);
-                    found = true;
-                    break;
-                }
-            }
-            if(!found){
-                result.setStatus("400");
-                result.setMsg("role not exist for current user:" + role.getId());
-            }else {
-                User tempUser = new User();
-                tempUser.setId(user.getId());
-                tempUser.setRoles(roles);
-
-                result.setStatus("200");
-            }
+            result = revokeRole(user, role, result);
         } catch (Exception e){
             logger.error("exception:" + e);
             result.setStatus("500");
@@ -548,7 +597,57 @@ public class UserController {
         return result;
     }
 
-    @GetMapping("/getAllUsers")
+    private BaseResult<String> revokeRole(User user, Role role, BaseResult<String> result){
+        if(null == user){
+            result.setStatus("400");
+            result.setMsg("user not exist");
+            return result;
+        }
+        if(null == role){
+            result.setStatus("400");
+            result.setMsg("role not exist");
+            return result;
+        }
+        boolean found = false;
+        List<Role> roles = user.getRoles();
+        for (Role r:roles){
+            if(r.getId() == role.getId()){
+                roles.remove(r);
+                found = true;
+                break;
+            }
+        }
+        if(!found){
+            result.setStatus("400");
+            result.setMsg("role not exist for current user:" + role.getId());
+        }else {
+            User tempUser = new User();
+            tempUser.setId(user.getId());
+            tempUser.setRoles(roles);
+
+            result.setStatus("200");
+        }
+        return result;
+    }
+
+    @GetMapping(value = "/revokeOtherRole/{roleId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequiresAuthentication
+    @RequiresPermissions(ShiroPermissions.UserRevokeOtherRole)
+    public BaseResult<String> revokeOtherRole(@PathVariable("roleId") Role role, @RequestParam("email")User user){
+        BaseResult<String> result = new BaseResult<String>();
+
+        try {
+            result = revokeRole(user, role, result);
+        } catch (Exception e){
+            logger.error("exception:" + e);
+            result.setStatus("500");
+            result.setMsg("exception:" + e.getMessage());
+        }
+
+        return result;
+    }
+
+    @GetMapping(value = "/getAllUsers", produces = MediaType.APPLICATION_JSON_VALUE)
     @RequiresAuthentication
     @RequiresPermissions(ShiroPermissions.UserGetAllUsers)
     public BaseResult<List<User>> getAllUsers(){
@@ -567,10 +666,10 @@ public class UserController {
         return result;
     }
 
-    @GetMapping("/getUser/{email}")
+    @GetMapping(value = "/getUser", produces = MediaType.APPLICATION_JSON_VALUE)
     @RequiresAuthentication
     @RequiresPermissions(ShiroPermissions.UserGetUser)
-    public BaseResult<User> getUser(@PathVariable("email")User user){
+    public BaseResult<User> getUser(@RequestParam("email")User user){
         BaseResult<User> result = new BaseResult<User>();
 
         try {
@@ -590,7 +689,7 @@ public class UserController {
         return result;
     }
 
-    @GetMapping("/getMyInfo")
+    @GetMapping(value = "/getMyInfo", produces = MediaType.APPLICATION_JSON_VALUE)
     @RequiresAuthentication
     @RequiresPermissions(ShiroPermissions.UserGetMyInfo)
     public BaseResult<User> getMyInfo(){
